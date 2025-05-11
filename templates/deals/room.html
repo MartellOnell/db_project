@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
+</head>
+<body>
+    {% for room in rooms %}
+        <div>
+            <p>id: {{ room.id }}</p>
+            <p>condition: {{ room.condition }}</p>
+            <p>status: {{ room.status }}</p>
+            <p>employee: {{ room.employee.username }}</p>
+            <button onclick="createBooking()">Create Booking</button>
+            <script>
+                function createBooking() {
+                    const userId = getCookie('user_id');
+                    if (userId) {
+                        window.location.href = `/deals/booking/?user_id=${userId}`;
+                    } else {
+                        alert('User ID not found in cookies.');
+                    }
+                }
+            </script>
+            <br>
+        </div>
+    {% endfor %}
+<script>
+    // Check if the "token" cookie exists
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    const token = getCookie('user_id');
+    if (!token) {
+        // Redirect to deals/login if the token cookie does not exist
+        window.location.href = '/deals/login/';
+    }
+</script>
+</body>
+</html>

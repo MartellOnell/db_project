@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Booking</title>
+</head>
+<body>
+    <h1>Create Booking</h1>
+    <form id="bookingForm">
+        {% csrf_token %}
+        <label for="room">Room:</label>
+        <select name="room" id="room" required>
+            {% for room in rooms %}
+                <option value="{{ room.id }}">{{ room.id }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <label for="checkin">Check-in Date:</label>
+        <input type="date" id="checkin" name="checkin" required>
+        <br><br>
+
+        <label for="checkout">Check-out Date:</label>
+        <input type="date" id="checkout" name="checkout" required>
+        <br><br>
+
+        <label for="order_menu">Order menu:</label>
+        <select name="order_menu" id="order_menu" required>
+            {% for dish in dishes %}
+                <option value="{{ dish.id }}">{{ dish.dish.dish_name }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        
+        document.getElementById('bookingForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            const userId = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('user_id='))
+                ?.split('=')[1];
+
+            if (userId) {
+                formData.append('guest', userId);
+            } else {
+                alert('User ID not found in cookies.');
+                return;
+            }
+
+            dataToSend = JSON.stringify(Object.fromEntries(formData));
+
+            try {
+                const response = await fetch("/deals/booking/", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    },
+                    body: dataToSend,
+                });
+
+                if (response.ok) {
+                    // Redirect to the "my booking" page on success
+                    window.location.href = "/deals/my_orders/";
+                } else {
+                    const errorData = await response.json();
+                    console.error('Error:', errorData);
+                    alert('Failed to create booking. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

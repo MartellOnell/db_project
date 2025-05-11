@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Order Menu</title>
+    <script>
+        // Function to get a cookie value by name
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // Add user_id to the form before submission
+        function addUserIdToForm() {
+            const userId = getCookie('user_id');
+            if (userId) {
+                const userIdInput = document.createElement('input');
+                userIdInput.type = 'hidden';
+                userIdInput.name = 'guest';
+                userIdInput.value = userId;
+                document.getElementById('orderForm').appendChild(userIdInput);
+            }
+        }
+
+        // Function to handle form submission
+        async function redirectToRooms(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Get form data
+            const form = document.getElementById('orderForm');
+            const formData = new FormData(form);
+            console.log('Form Data:', Object.fromEntries(formData.entries()));
+
+            // Add user_id from cookie to the form data
+            const userId = getCookie('user_id');
+            if (userId) {
+            formData.append('guest', userId);
+            }
+            dataToSend = JSON.stringify(Object.fromEntries(formData));
+            // Send data to the server
+            try {
+            const response = await fetch('/deals/order_menu/', {
+                method: 'POST',
+                body: dataToSend,
+            });
+
+            if (response.ok) {
+                // Redirect to /deals/rooms/ on success
+                window.location.href = '/deals/rooms/';
+            } else {
+                console.error('Failed to submit order:', response.statusText);
+            }
+            } catch (error) {
+            console.error('Error submitting order:', error);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Create Order Menu</h1>
+    <form id="orderForm" onsubmit="redirectToRooms(event)">
+        <!-- CSRF Token (if using Django templates) -->
+        {% csrf_token %}
+
+        <!-- Dish Selection -->
+        <label for="dish">Select Dish:</label>
+        <select id="dish" name="dish" required>
+            <!-- Dynamically populate menu items -->
+            {% for menu_item in menu_items %}
+            <option value="{{ menu_item.id }}">{{ menu_item.id }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <!-- Quantity Input -->
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+        <br><br>
+
+        <button type="submit" id="submitForm">Submit Order</button>
+    </form>
+</body>
+</html>
