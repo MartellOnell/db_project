@@ -21,12 +21,14 @@ class CustomUser(AbstractUser):
             ),
         ],
         max_length=17,
+        null=True,
     )
 
     gender = models.ForeignKey(
         to=Gender,
         on_delete=models.PROTECT,
         verbose_name='gender',
+        null=True,
     )
 
     position = models.ForeignKey(
