@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.urls import path, include
 
-from apps.staff.overwritten_admin_site import site
+from django.contrib.admin.sites import site
 
 urlpatterns = [
     path('admin/', site.urls),
