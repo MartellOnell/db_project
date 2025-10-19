@@ -28,5 +28,5 @@ class OrderMenuItem(models.Model):
 
 
     class Meta:
-        verbose_name = 'menu item'
-        verbose_name_plural = 'menu items'
+        verbose_name = 'order menu'
+        verbose_name_plural = 'order menu'
